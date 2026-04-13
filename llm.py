@@ -1,10 +1,8 @@
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
+import openai
+import streamlit as st
 
-load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Use Streamlit secrets (for deployment)
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def generate_sql(question):
     try:
@@ -26,12 +24,13 @@ def generate_sql(question):
         SQL:
         """
 
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4.1-mini",
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100
         )
 
-        return response.choices[0].message.content.strip()
+        return response['choices'][0]['message']['content'].strip()
 
     except Exception as e:
         return f"ERROR: {e}"
